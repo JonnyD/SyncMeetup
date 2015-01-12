@@ -2,4 +2,4 @@ vendor/*
 !vendor/.gitkeep
 cache/*
 !cache/.gitkeep
-.idea
+.idea/
