@@ -1,0 +1,20 @@
+{
+    "repositories": [
+        {
+            "url": "https://github.com/JonnyD/Meetup.git",
+            "type": "git"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "silex/silex": "~1.1",
+        "symfony/twig-bridge": "~2.3",
+        "dflydev/doctrine-orm-service-provider": "1.0.*@dev",
+        "guzzlehttp/guzzle": "~5.0",
+        "google/apiclient": "1.0.*@beta",
+        "user3581488/Meetup": "~1.0"
+    },
+    "autoload": {
+        "psr-0": {"GoogleCal": "src/"}
+    }
+}

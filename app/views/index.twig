@@ -1,0 +1,8 @@
+<h1>Sync Meetup</h1>
+
+Click the Meetup.com logo below to connect your account. <br />
+{% if user.meetupId is null %}
+    <a href="{{ meetupAuthUrl }}">
+        <img src="http://img2.meetupstatic.com/img/8308650022681532654/header/logo-2x.png" />
+    </a>
+{% endif %}
