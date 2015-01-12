@@ -1,3 +1,3 @@
 # SyncMeetup
 
-Start at /web/index.php
+Built with Silex PHP Framework. Start at /web/index.php
