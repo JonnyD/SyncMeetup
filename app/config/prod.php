@@ -14,21 +14,21 @@ $app['admin_email'] = 'noreply@nothing.nothing';
 $app['site_email'] = 'noreply@nothing.nothing';
 
 // Google API Credentials
-$app['google.client_id'] = 'xxxxxxxxxxxxxxxxx';
-$app['google.client_secret'] = 'xxxxxxxxxxxxxxxxx';
-$app['google.redirect_uri'] = 'http://xxxxxxxxxxxxxxxxx';
+$app['google.client_id'] = '188966657941-peuvht3pm79ct3tm2md1hb6svkkse4ko.apps.googleusercontent.com';
+$app['google.client_secret'] = 'tiJd6UjkNn1rdOMzX9S3qGOb';
+$app['google.redirect_uri'] = 'http://localhost/GoogleCalendar/web/index.php/google/connect';
 
 // Meetup API Credentials
-$app['meetup.client_id'] = 'xxxxxxxxxxxxxxxxx';
-$app['meetup.client_secret'] = 'xxxxxxxxxxxxxxxxx';
-$app['meetup.redirect_uri'] = 'http://xxxxxxxxxxxxxxxxx';
+$app['meetup.client_id'] = 'oq3psc9d866e8usngenft54k1a';
+$app['meetup.client_secret'] = 'i479cnpta9mfh83kkl3pe3oojq';
+$app['meetup.redirect_uri'] = 'http://localhost/GoogleCalendar/web/index.php/meetup/connect';
 
 // Doctrine (db)
 $app['db.options'] = array(
     'driver'   => 'pdo_mysql',
     'host'     => '127.0.0.1',
     'port'     => '3306',
-    'dbname'   => 'dbname',
+    'dbname'   => 'SyncMeetup',
     'user'     => 'root',
     'password' => '',
 );

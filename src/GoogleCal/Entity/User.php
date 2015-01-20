@@ -58,4 +58,9 @@ class User
     {
         $this->googleDetails = $googleDetails;
     }
+
+    public function setCalendar($calendar)
+    {
+        $this->googleDetails->setCalendar($calendar);
+    }
 }

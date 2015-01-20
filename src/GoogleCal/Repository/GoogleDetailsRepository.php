@@ -28,8 +28,14 @@ class GoogleDetailsRepository
     {
         $googleDetailsData = array(
             'access_token' => $googleDetails->getAccessToken(),
-            'refresh_token' => $googleDetails->getRefreshToken()
+            'refresh_token' => $googleDetails->getRefreshToken(),
+            'calendar' => $googleDetails->getCalendar()
         );
+
+        $expires = $googleDetails->getExpires();
+        if ($expires != null) {
+            $googleDetailsData = array_merge($googleDetailsData, array('expires' => $expires->format('Y-m-d H:i:s')));
+        }
 
         $googleDetailsId = $googleDetails->getId();
         if ($googleDetailsId) {
@@ -53,6 +59,11 @@ class GoogleDetailsRepository
         $googleDetails->setId($googleDetailsData['id']);
         $googleDetails->setAccessToken($googleDetailsData['access_token']);
         $googleDetails->setRefreshToken($googleDetailsData['refresh_token']);
+        $googleDetails->setCalendar($googleDetailsData['calendar']);
+        if ($googleDetailsData['expires'] != null) {
+            $expires = new \DateTime($googleDetailsData['expires']);
+            $googleDetails->setExpires($expires);
+        }
         return $googleDetails;
     }
 }

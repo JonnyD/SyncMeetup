@@ -20,16 +20,28 @@ class MeetupClient extends \Meetup
         return $location;
     }
 
+    public function refresh($refreshToken)
+    {
+        return parent::refresh(array('refresh_token' => $refreshToken));
+    }
+
     public function authenticate($code)
     {
         $this->_parameters = array_merge($this->_parameters, array('code' => $code));
         $response = $this->access();
+        $this->setAccessToken($response->access_token);
+        $this->setRefreshToken($response->refresh_token);
         return $response;
     }
 
     public function setAccessToken($accessToken)
     {
         $this->_parameters = array_merge($this->_parameters, array('access_token' => $accessToken));
+    }
+
+    public function setRefreshToken($refreshToken)
+    {
+        $this->_parameters = array_merge($this->_parameters, array('refresh_token' => $refreshToken));
     }
 
     public function getCurrentMember()

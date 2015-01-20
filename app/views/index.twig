@@ -1,8 +1,18 @@
 <h1>Sync Meetup</h1>
 
-Click the Meetup.com logo below to connect your account. <br />
-{% if user.meetupId is null %}
+{% if user is not null %}
+    <a href="#">Logout</a> <br />
+{% endif %}
+
+{% if user.meetupDetails is null %}
+    Click the Meetup.com logo below to connect your account. <br />
     <a href="{{ meetupAuthUrl }}">
         <img src="http://img2.meetupstatic.com/img/8308650022681532654/header/logo-2x.png" />
     </a>
+{% else %}
+    {% if user.googleDetails is null %}
+        <a href="{{ googleAuthUrl }}" class="zocial google">Sign in with Google</a>
+    {% else %}
+        Sign in
+    {% endif %}
 {% endif %}

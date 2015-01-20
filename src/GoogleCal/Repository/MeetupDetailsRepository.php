@@ -19,14 +19,18 @@ class MeetupDetailsRepository
 
     public function find($id)
     {
-        $meetupDetailsData = $this->db->fetchAssoc('SELECT * FROM meetup_details WHERE id = ?', array($id));
-        return $this->buildMeetupDetails($meetupDetailsData);
+        $sql = 'SELECT * FROM meetup_details WHERE id = ?';
+        $meetupDetailsData = $this->db->fetchAssoc($sql, array($id));
+        $meetupDetails = $this->buildMeetupDetails($meetupDetailsData);
+        return $meetupDetails;
     }
 
     public function findByMeetupId($meetupId)
     {
-        $meetupDetailsData = $this->db->fetchAssoc('SELECT * FROM meetup_details WHERE meetup_id = ?', array($meetupId));
-        return $this->buildMeetupDetails($meetupDetailsData);
+        $sql = 'SELECT * FROM meetup_details WHERE meetup_id = ?';
+        $meetupDetailsData = $this->db->fetchAssoc($sql, array($meetupId));
+        $meetupDetails = $this->buildMeetupDetails($meetupDetailsData);
+        return $meetupDetails;
     }
 
     public function save(MeetupDetails $meetupDetails)
@@ -38,6 +42,11 @@ class MeetupDetailsRepository
             'access_token' => $meetupDetails->getAccessToken(),
             'refresh_token' => $meetupDetails->getRefreshToken()
         );
+
+        $expires = $meetupDetails->getExpires();
+        if ($expires != null) {
+            $meetupDetailsData = array_merge($meetupDetailsData, array('expires' => $expires->format('Y-m-d H:i:s')));
+        }
 
         $meetupDetailsId = $meetupDetails->getId();
         if ($meetupDetailsId) {
@@ -64,6 +73,10 @@ class MeetupDetailsRepository
         $meetupDetails->setThumbnail($meetupDetailsData['thumbnail']);
         $meetupDetails->setAccessToken($meetupDetailsData['access_token']);
         $meetupDetails->setRefreshToken($meetupDetailsData['refresh_token']);
+        if ($meetupDetailsData['expires'] != null) {
+            $expires = new \DateTime($meetupDetailsData['expires']);
+            $meetupDetails->setExpires($expires);
+        }
         return $meetupDetails;
     }
 }

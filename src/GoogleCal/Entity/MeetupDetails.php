@@ -50,6 +50,13 @@ class MeetupDetails
      */
     private $refreshToken;
 
+    /**
+     * MeetupDetils expires
+     *
+     * @var \DateTime
+     */
+    private $expires;
+
     public function getId()
     {
         return $this->id;
@@ -108,5 +115,21 @@ class MeetupDetails
     public function setRefreshToken($refreshToken)
     {
         $this->refreshToken = $refreshToken;
+    }
+
+    public function getExpires()
+    {
+        return $this->expires;
+    }
+
+    public function setExpires(\DateTime $expires)
+    {
+        $this->expires = $expires;
+    }
+
+    public function hasExpired()
+    {
+        $now = new \DateTime();
+        return $now > $this->expires;
     }
 }

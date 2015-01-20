@@ -47,6 +47,15 @@ class UserService
         return $this->userRepository->findByMeetupId($meetupId);
     }
 
+    public function ensureUserByMeetupId($meetupId)
+    {
+        $user = $this->getUserByMeetupId($meetupId);
+        if ($user == null) {
+            $user = new User();
+        }
+        return $user;
+    }
+
     public function getMeetupDetailsByMeetupId($meetupId)
     {
         return $this->meetupDetailsRepository->findByMeetupId($meetupId);

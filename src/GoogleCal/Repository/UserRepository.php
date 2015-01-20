@@ -26,16 +26,27 @@ class UserRepository
 
     public function find($id)
     {
-        $userData = $this->db->fetchAssoc('SELECT * FROM user WHERE id = ?', array($id));
-        return $this->buildUser($userData);
+        $sql = 'SELECT * FROM user WHERE id = ?';
+        $userData = $this->db->fetchAssoc($sql, array($id));
+        $user = $this->buildUser($userData);
+        return $user;
     }
 
     public function findByMeetupId($meetupId)
     {
-        $userData = $this->db->fetchAssoc('
-            SELECT user.* FROM user
-            JOIN meetup_details on user.meetup_details_id = meetup_details.id
-            WHERE meetup_details.meetup_id = ?', array($meetupId));
+        $sql = 'SELECT user.* FROM user
+                JOIN meetup_details on user.meetup_details_id = meetup_details.id
+                WHERE meetup_details.meetup_id = ?';
+        $userData = $this->db->fetchAssoc($sql, array($meetupId));
+        $user = $this->buildUser($userData);
+        return $user;
+    }
+
+    public function findByGoogleId($googleId)
+    {
+        $sql = 'SELECT * FROM USER
+                WHERE google_details_id = ?';
+        $userData = $this->db->fetchAssoc($sql, array($googleId));
         $user = $this->buildUser($userData);
         return $user;
     }

@@ -10,6 +10,10 @@
         "silex/silex": "~1.1",
         "symfony/twig-bridge": "~2.3",
         "dflydev/doctrine-orm-service-provider": "1.0.*@dev",
+        "symfony/form": "~2.3",
+        "symfony/locale": "~2.3",
+        "symfony/translation": "~2.3",
+        "symfony/security-csrf": "~2.4",
         "guzzlehttp/guzzle": "~5.0",
         "google/apiclient": "1.0.*@beta",
         "user3581488/Meetup": "~1.0"
