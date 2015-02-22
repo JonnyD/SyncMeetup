@@ -26,6 +26,7 @@ class __TwigTemplate_96a17953c3dd74d3490811737b10e5b94de234c59deb74941dab42d63d3
 ";
         }
         // line 6
+        echo twig_var_dump($this->env, $context, (isset($context["user"]) ? $context["user"] : $this->getContext($context, "user")));
         echo "
 ";
         // line 7
@@ -48,10 +49,6 @@ class __TwigTemplate_96a17953c3dd74d3490811737b10e5b94de234c59deb74941dab42d63d3
                 echo twig_escape_filter($this->env, (isset($context["googleAuthUrl"]) ? $context["googleAuthUrl"] : $this->getContext($context, "googleAuthUrl")), "html", null, true);
                 echo "\" class=\"zocial google\">Sign in with Google</a>
     ";
-            } else {
-                // line 16
-                echo "        Sign in
-    ";
             }
         }
     }
@@ -68,6 +65,6 @@ class __TwigTemplate_96a17953c3dd74d3490811737b10e5b94de234c59deb74941dab42d63d3
 
     public function getDebugInfo()
     {
-        return array (  53 => 16,  47 => 14,  44 => 13,  37 => 9,  34 => 8,  32 => 7,  29 => 6,  25 => 4,  23 => 3,  19 => 1,);
+        return array (  48 => 14,  45 => 13,  38 => 9,  35 => 8,  33 => 7,  29 => 6,  25 => 4,  23 => 3,  19 => 1,);
     }
 }

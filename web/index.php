@@ -19,12 +19,14 @@ use Symfony\Component\HttpFoundation\Response;
 use GoogleCal\Repository\MeetupDetailsRepository;
 use GoogleCal\Repository\GoogleDetailsRepository;
 use GoogleCal\Repository\UserRepository;
+use GoogleCal\Repository\EventRepository;
 use GoogleCal\Service\UserService;
 use GoogleCal\Service\GoogleService;
 use GoogleCal\Service\MeetupService;
+use GoogleCal\Service\EventService;
 use GoogleCal\Controller\RootController;
-use GoogleCal\Controller\Controller;
 use GoogleCal\Controller\AuthController;
+use GoogleCal\Controller\CalendarController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -72,6 +74,10 @@ $app['repository.user'] = $app->share(function ($app) {
         $app['repository.google_details']);
 });
 
+$app['repository.event'] = $app->share(function ($app) {
+    return new EventRepository($app['db']);
+});
+
 // Register Services
 $app['service.user'] = $app->share(function ($app) {
     return new UserService(
@@ -93,61 +99,58 @@ $app['service.meetup'] = $app->share(function ($app) {
         $app['repository.meetup_details']);
 });
 
-// Register Controllers
-$app['controller.base'] = $app->share(function() use ($app) {
-   return new Controller(
-       $app['twig'],
-       $app['session'],
-       $app['url_generator'],
-       $app['form.factory']);
+$app['service.event'] = $app->share(function ($app) {
+    return new EventService(
+        $app['repository.event']);
 });
 
+// Register Controllers
 $app['controller.root'] = $app->share(function() use ($app) {
-    $rootController = new RootController(
+    return new RootController(
         $app['service.user'],
         $app['service.meetup'],
-        $app['service.google']);
-
-    $rootController->populateParent(
+        $app['service.google'],
         $app['twig'],
         $app['session'],
         $app['form.factory'],
         $app['url_generator']);
-
-    return $rootController;
 });
 
 $app['controller.auth'] = $app->share(function() use ($app) {
-   $authController = new AuthController(
+   return new AuthController(
         $app['service.google'],
         $app['service.user'],
-        $app['service.meetup']);
-
-    $authController->populateParent(
+        $app['service.meetup'],
         $app['twig'],
         $app['session'],
         $app['form.factory'],
         $app['url_generator']);
-
-    return $authController;
 });
 
 $app['controller.calendar'] = $app->share(function() use ($app) {
-    $authController = new AuthController(
+    return new CalendarController(
         $app['service.google'],
         $app['service.user'],
-        $app['service.meetup']);
-
-    $authController->populateParent(
+        $app['service.meetup'],
+        $app['service.event'],
         $app['twig'],
         $app['session'],
         $app['form.factory'],
         $app['url_generator']);
-
-    return $authController;
 });
 
 // Register Middlewares
+$isLoggedIn = function (Request $request, $app) {
+    $userService = $app['service.user'];
+    $urlGenerator = $app['url_generator'];
+
+    $user = $userService->getLoggedInUser();
+    if ($user == null) {
+        $redirectUrl = $urlGenerator->generate('home');
+        return new RedirectResponse($redirectUrl);
+    }
+};
+
 $checkGoogleExpiryDate = function (Request $request, $app) {
     $userService = $app['service.user'];
     $urlGenerator = $app['url_generator'];
@@ -156,19 +159,30 @@ $checkGoogleExpiryDate = function (Request $request, $app) {
 
     $googleDetails = $user->getGoogleDetails();
     if ($googleDetails->hasExpired()) {
-        $redirectUrl = $urlGenerator->generate('auth.refresh.google',
-            array('referrer' => 'google.selectCalendar'));
+        $route = $app['routes']->get($request->get('_route'));
+        $path = str_replace("/", ".", ltrim($route->getPath(), '/'));
+        $redirectUrl = $urlGenerator->generate('auth.refresh.google', array('referrer' => $path));
         return new RedirectResponse($redirectUrl);
     }
 };
 
 $checkMeetupExpiryDate  = function (Request $request, $app) {
+    $userService = $app['service.user'];
+    $urlGenerator = $app['url_generator'];
 
+    $user = $userService->getLoggedInUser();
+
+    $meetupDetails = $user->getMeetupDetails();
+    if ($meetupDetails->hasExpired()) {
+        $route = $app['routes']->get($request->get('_route'));
+        $path = str_replace("/", ".", ltrim($route->getPath(), '/'));
+        $redirectUrl = $urlGenerator->generate('auth.refresh.meetup', array('referrer' => $path));
+        return new RedirectResponse($redirectUrl);
+    }
 };
 
 // Register Routes
 $app->get('/', 'controller.root:indexAction')
-    ->before($checkGoogleExpiryDate)
     ->bind('home');
 $app->get('/auth/connect/meetup', 'controller.auth:connectMeetupAction')
     ->bind('auth.connect.meetup');
@@ -178,12 +192,17 @@ $app->get('/auth/connect/google', 'controller.auth:connectGoogleAction')
     ->bind('auth.connect.google');
 $app->get('/auth/refresh/google', 'controller.auth:refreshGoogleAction')
     ->bind('auth.refresh.google');
-$app->get('/google/selectCalendar', 'controller.google:selectCalendarAction')
-    ->bind('google.selectCalendar');
-$app->post('/google/selectCalendar', 'controller.google:selectCalendarAction')
-    ->bind('google.selectedCalendar');
-$app->get('/google/sync', 'controller.google:syncAction')
-    ->bind('google.sync');
+$app->get('/calendar/select', 'controller.calendar:selectAction')
+    ->before($checkGoogleExpiryDate)
+    ->bind('calendar.selectCalendar');
+$app->post('/calendar/select', 'controller.calendar:selectAction')
+    ->before($checkGoogleExpiryDate);
+$app->post('/calendar/selected', 'controller.calendar:selectedAction')
+    ->bind('calendar.selectedCalendar');
+$app->get('/calendar/sync', 'controller.calendar:syncAction')
+    ->before($checkGoogleExpiryDate)
+    ->before($checkMeetupExpiryDate)
+    ->bind('calendar.sync');
 
 // Register the error handler.
 $app->error(function (\Exception $e, $code) use ($app) {

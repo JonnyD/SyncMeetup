@@ -9,24 +9,31 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-class AuthController extends Controller
+class AuthController
 {
     private $googleService;
     private $userService;
     private $meetupService;
+    private $twig;
+    private $session;
+    private $formFactory;
+    private $urlGenerator;
 
     public function __construct(GoogleService $googleService,
                                 UserService $userService,
-                                MeetupService $meetupService)
+                                MeetupService $meetupService,
+                                $twig,
+                                $session,
+                                $formFactory,
+                                $urlGenerator)
     {
         $this->googleService = $googleService;
         $this->userService = $userService;
         $this->meetupService = $meetupService;
-    }
-
-    public function populateParent($twig, $session, $formFactory, $urlGenerator)
-    {
-        parent::__construct($twig, $session, $formFactory, $urlGenerator);
+        $this->twig = $twig;
+        $this->session = $session;
+        $this->formFactory = $formFactory;
+        $this->urlGenerator = $urlGenerator;
     }
 
     public function connectGoogleAction(Request $request)
@@ -54,8 +61,9 @@ class AuthController extends Controller
         $this->googleService->refreshTokenByUser($user);
 
         $redirectUrl = $this->urlGenerator->generate('home');
-        if ($request->get('referrer')) {
-            $redirectUrl = $this->urlGenerator->generate($request->get('referrer'));
+        $referrer = $request->get('referrer');
+        if ($referrer) {
+            $redirectUrl = $this->urlGenerator->generate($referrer);
         }
 
         return new RedirectResponse($redirectUrl);
@@ -91,10 +99,18 @@ class AuthController extends Controller
         $this->meetupService->refreshTokenByUser($user);
 
         $redirectUrl = $this->urlGenerator->generate('home');
-        if ($request->get('referrer')) {
-            $redirectUrl = $this->urlGenerator->generate($request->get('referrer'));
+        $referrer = $request->get('referrer');
+        if ($referrer) {
+            $redirectUrl = $this->urlGenerator->generate($referrer);
         }
 
         return new RedirectResponse($redirectUrl);
+    }
+
+    public function logoutAction()
+    {
+        $this->userService->logoutUser();
+
+        return new RedirectResponse('home');
     }
 }

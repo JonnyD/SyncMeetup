@@ -8,24 +8,31 @@ use GoogleCal\Service\MeetupService;
 use GoogleCal\Service\UserService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
-class RootController extends Controller
+class RootController
 {
     private $userService;
     private $meetupService;
     private $googleService;
+    private $twig;
+    private $session;
+    private $formFactory;
+    private $urlGenerator;
 
     public function __construct(UserService $userService,
                                 MeetupService $meetupService,
-                                GoogleService $googleService)
+                                GoogleService $googleService,
+                                $twig,
+                                $session,
+                                $formFactory,
+                                $urlGenerator)
     {
         $this->userService = $userService;
         $this->meetupService = $meetupService;
         $this->googleService = $googleService;
-    }
-
-    public function populateParent($twig, $session, $formFactory, $urlGenerator)
-    {
-        parent::__construct($twig, $session, $formFactory, $urlGenerator);
+        $this->twig = $twig;
+        $this->session = $session;
+        $this->formFactory = $formFactory;
+        $this->urlGenerator = $urlGenerator;
     }
 
     public function indexAction()
@@ -41,17 +48,10 @@ class RootController extends Controller
         $meetupClient = $this->meetupService->createClient();
         $meetupAuthUrl = $meetupClient->createAuthUrl();
 
-        return $this->render('index.twig', array(
+        return $this->twig->render('index.twig', array(
             'user' => $user,
             'googleAuthUrl' => $googleAuthUrl,
             'meetupAuthUrl' => $meetupAuthUrl
         ));
-    }
-
-    public function logoutAction()
-    {
-        $this->userService->logoutUser();
-
-        return $this->redirect('home');
     }
 }

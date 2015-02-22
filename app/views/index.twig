@@ -3,7 +3,7 @@
 {% if user is not null %}
     <a href="#">Logout</a> <br />
 {% endif %}
-
+{{ dump(user) }}
 {% if user.meetupDetails is null %}
     Click the Meetup.com logo below to connect your account. <br />
     <a href="{{ meetupAuthUrl }}">
@@ -12,7 +12,5 @@
 {% else %}
     {% if user.googleDetails is null %}
         <a href="{{ googleAuthUrl }}" class="zocial google">Sign in with Google</a>
-    {% else %}
-        Sign in
     {% endif %}
 {% endif %}
